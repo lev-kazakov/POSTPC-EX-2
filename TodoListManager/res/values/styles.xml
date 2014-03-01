@@ -16,5 +16,8 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    
+    <color name="firstItem">#ff0000</color>
+    <color name="secondItem">#0000ff</color>
 
 </resources>
