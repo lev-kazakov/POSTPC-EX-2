@@ -18,37 +18,19 @@ public class ToDoArrayAdapter<S> extends ArrayAdapter<String> {
     private static final int TYPE_SECOND = 1;
     private static final int TYPE_MAX_COUNT = TYPE_SECOND + 1;
 	
-	private List<String> todoList;
 	private LayoutInflater inflater;
 	private Context mContext;
 	
 	public ToDoArrayAdapter(Context context, int resource, List<String> list) {
 		super(context, resource, list);
 		mContext = context;
-		todoList = list;
 	}
-
-	@Override
-    public int getCount() {
-        return todoList.size();
-    }
-
-    @Override
-    public String getItem(int position) {
-        return todoList.get(position);
-    }
 
     @Override
     public long getItemId(int position) {
         return position;
     }
 	
-    @Override
-    public void add(String item) {
-    	todoList.add(item);
-        notifyDataSetChanged();
-    }
-    
     @Override
     public int getViewTypeCount() {
     	return TYPE_MAX_COUNT;
