@@ -83,7 +83,7 @@ public class TodoListManagerActivity extends Activity {
 				LinearLayout alertView = (LinearLayout) getLayoutInflater()
 						.inflate(R.layout.alert_view, null);
 				Button btnDelete = (Button) alertView
-						.findViewById(R.id.btnDelete);
+						.findViewById(R.id.menuItemDelete);
 
 				btnDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -95,13 +95,13 @@ public class TodoListManagerActivity extends Activity {
 				});
 
 				if (itemTitle.toLowerCase(Locale.getDefault()).startsWith(
-						"call")) {
+						"call ")) {
 					final String phoneNumber = itemTitle.substring(5).trim();
 					Button btnCall = (Button) getLayoutInflater().inflate(
 							R.layout.alert_call, null);
 					
 					if (PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)) {
-						btnCall.setText("Call " + phoneNumber);
+						btnCall.setText(itemTitle);
 						btnCall.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
