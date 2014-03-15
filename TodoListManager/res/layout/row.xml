@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:paddingStart="?android:attr/listPreferredItemPaddingStart"
     android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall" >
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:gravity="center" >
     
-    <TextView android:id="@+id/todoItem"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall" >
+    <TextView android:id="@+id/txtTodoTitle"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="0.5"
+	    android:textAppearance="?android:attr/textAppearanceListItemSmall" >
+    </TextView>
+    
+    <TextView android:id="@+id/txtTodoDueDate"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="0.5"
+	    android:textAppearance="?android:attr/textAppearanceListItemSmall" >
     </TextView>
 
 </LinearLayout>

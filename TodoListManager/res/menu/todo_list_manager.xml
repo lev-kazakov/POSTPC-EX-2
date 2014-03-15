@@ -3,6 +3,7 @@
     <item 
         android:id="@+id/menuItemAdd" 
         android:title="@string/menuAdd" 
-        android:icon="@android:drawable/ic_menu_add" />
+        android:icon="@android:drawable/ic_menu_add" 
+        android:showAsAction="always" />
         
 </menu>

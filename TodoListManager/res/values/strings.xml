@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">TodoListManager</string>
+    <string name="app_name">Todo List Manager</string>
     <string name="action_settings">Settings</string>
     <string name="edtHint">add a task here</string>
     <string name="menuAdd">Add</string>
     <string name="alertDelete">Delete Item</string>
-    
-    <!-- 
+
+    <!--
     <string-array name="strArrTodos">
         
   	</string-array>
     -->
+    <string name="title_activity_add_new_todo_item">Add New Item</string>
+    <string name="strCancel">Cancel</string>
+    <string name="strOK">OK</string>
     <string name="no_tasks">finished all tasks! nice!</string>
-    
-    
 
 </resources>

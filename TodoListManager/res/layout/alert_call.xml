@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_gravity="center_horizontal"
+	android:layout_weight="1"
+	style="?android:attr/buttonBarButtonStyle"
+	android:maxLines="2"
+	android:layout_height="0dip"
+	android:textColor="@android:color/holo_blue_bright" />
