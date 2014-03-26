@@ -1,6 +1,5 @@
 package il.ac.huji.todolist;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -8,15 +7,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,43 +22,35 @@ import android.widget.TextView;
 
 public class TodoListManagerActivity extends Activity {
 
-	protected static final int REQUEST_NEW_ITEM = 01;
-	private ArrayAdapter<TodoItem> todosAdapter;
-	private ArrayList<TodoItem> todos;
+	private static final int REQUEST_NEW_ITEM = 01;
+	
+	private TodosDataSource datasource;
+	private ToDoCursorAdapter todosCursorAdapter;
 	final Context context = this;
+	
+	private static final String[] DB_FROM = { SQLiteDBHelper.COLUMN_TITLE, SQLiteDBHelper.COLUMN_DUE };
+	private static final int[] DB_TO = { R.id.txtTodoTitle, R.id.txtTodoDueDate };
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putSerializable("todos", todos);
-	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_todo_list_manager);
 
-		this.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
 		ListView lstTodoItems = (ListView) findViewById(R.id.lstTodoItems);
 		lstTodoItems.setEmptyView(findViewById(android.R.id.empty));
+		
+		datasource = new TodosDataSource(context);
+		datasource.open();
+		
+		Cursor cursor = datasource.getCursorForAllTodos();
+		todosCursorAdapter = new ToDoCursorAdapter(getApplicationContext(),
+				R.layout.row, cursor, DB_FROM, DB_TO);
+		lstTodoItems.setAdapter(todosCursorAdapter);
+		
+		datasource.close();
+		todosCursorAdapter.changeCursor(cursor);
 
-		if (savedInstanceState != null) {
-			todos = (ArrayList<TodoItem>) savedInstanceState
-					.getSerializable("todos");
-		}
-
-		if (todos == null) {
-			todos = new ArrayList<TodoItem>();
-		}
-
-		todosAdapter = new ToDoArrayAdapter<TodoItem>(getApplicationContext(),
-				R.layout.row, todos);
-
-		lstTodoItems.setAdapter(todosAdapter);
-		todosAdapter.notifyDataSetChanged();
 
 		// delete task interface
 		lstTodoItems.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -88,8 +78,10 @@ public class TodoListManagerActivity extends Activity {
 				btnDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						todos.remove(position);
-						todosAdapter.notifyDataSetChanged();
+						datasource.open();
+						datasource.deleteTodo(todosCursorAdapter.getItemId(position));
+						todosCursorAdapter.changeCursor(datasource.getCursorForAllTodos());
+						datasource.close();
 						alertDialog.dismiss();
 					}
 				});
@@ -133,18 +125,22 @@ public class TodoListManagerActivity extends Activity {
 
 	}
 
+	// add task interface
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case 01:
 			if (resultCode == RESULT_OK) {
 				String title = data.getStringExtra("title");
-				if (title.length() == 0) {
+				Date dueDate = (Date) data.getSerializableExtra("dueDate");
+				if (title.length() == 0 || title == null || dueDate == null) {
 					return;
 				}
-				Date dueDate = (Date) data.getSerializableExtra("dueDate");
-				todos.add(new TodoItem(title, dueDate));
-				todosAdapter.notifyDataSetChanged();
+				
+				datasource.open();
+				datasource.addTodo(title, dueDate);
+				todosCursorAdapter.changeCursor(datasource.getCursorForAllTodos());
+				datasource.close();
 			}
 			break;
 

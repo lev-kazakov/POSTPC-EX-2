@@ -65,5 +65,4 @@ public class AddNewTodoItemActivity extends Activity {
 		});
 		
 	}
-
 }
