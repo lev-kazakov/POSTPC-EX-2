@@ -11,7 +11,7 @@ public class ToDoApp extends Application {
 	public void onCreate() {
 		super.onCreate();
 		
-		Parse.initialize(this, "hR9KVSBekShAlSENwE6SZKz0tzqiHystl9HKJyIw", "mdYlcbUxYHi2WZxivVo3vEafsuUhlLPRMpbRZsuW");
+		Parse.initialize(this, "8NFAjS98ukTgBZmu1ezIUekXLbJgSLfznCUBg5Vm", "tcWKBajTWuT4aL2mFqw3AdJswmBedr2b70dNe2Ba");
 		ParseUser.enableAutomaticUser();
 //		ParseACL defaultACL = new ParseACL();
 //		defaultACL.setPublicReadAccess(true);
