@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.view.Menu;
@@ -41,16 +42,14 @@ public class TodoListManagerActivity extends Activity {
 		lstTodoItems.setEmptyView(findViewById(android.R.id.empty));
 		
 		datasource = new TodosDataSource(context);
-		datasource.open();
-		
-		Cursor cursor = datasource.getCursorForAllTodos();
 		todosCursorAdapter = new ToDoCursorAdapter(getApplicationContext(),
-				R.layout.row, cursor, DB_FROM, DB_TO);
+				R.layout.row, null, DB_FROM, DB_TO);
 		lstTodoItems.setAdapter(todosCursorAdapter);
 		
-		datasource.close();
-		todosCursorAdapter.changeCursor(cursor);
 
+		// update list
+		UpdateTodoList update = new UpdateTodoList();
+		update.execute();
 
 		// delete task interface
 		lstTodoItems.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -78,14 +77,13 @@ public class TodoListManagerActivity extends Activity {
 				btnDelete.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						datasource.open();
-						datasource.deleteTodo(todosCursorAdapter.getItemId(position));
-						todosCursorAdapter.changeCursor(datasource.getCursorForAllTodos());
-						datasource.close();
+						DeleteTodoItem delete = new DeleteTodoItem();
+						delete.execute(position);
 						alertDialog.dismiss();
 					}
 				});
 
+				// add call option
 				if (itemTitle.toLowerCase(Locale.getDefault()).startsWith(
 						"call ")) {
 					final String phoneNumber = itemTitle.substring(5).trim();
@@ -137,10 +135,10 @@ public class TodoListManagerActivity extends Activity {
 					return;
 				}
 				
-				datasource.open();
-				datasource.addTodo(title, dueDate);
-				todosCursorAdapter.changeCursor(datasource.getCursorForAllTodos());
-				datasource.close();
+				// add a todo item
+				AddTodoItem add = new AddTodoItem(title, dueDate);
+				add.execute();
+
 			}
 			break;
 
@@ -164,6 +162,102 @@ public class TodoListManagerActivity extends Activity {
 			startActivityForResult(intent, REQUEST_NEW_ITEM);
 		}
 		return true;
+	}
+	
+	
+	private class UpdateTodoList extends AsyncTask<Void, Cursor, Void> {
+		
+		@Override
+		protected void onPreExecute() {
+			datasource.open();
+		}
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			Cursor cursor = datasource.getCursorForAllTodos();
+			// force the query to be fully executed
+			// https://groups.google.com/forum/#!topic/android-developers/wTRuxuIxDAw
+			cursor.getCount();
+			// just playing with the API
+			publishProgress(cursor);
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Cursor... values) {
+			todosCursorAdapter.changeCursor(values[0]);
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			datasource.close();
+		}
+		
+	}
+	
+	private class DeleteTodoItem extends AsyncTask<Integer, Cursor, Void> {
+		
+		@Override
+		protected void onPreExecute() {
+			datasource.open();
+		}
+		
+		@Override
+		protected Void doInBackground(Integer... params) {
+			datasource.deleteTodo(todosCursorAdapter.getItemId(params[0]));
+			Cursor cursor = datasource.getCursorForAllTodos();
+			// force the query to be fully executed
+			cursor.getCount();
+			publishProgress(cursor);
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Cursor... values) {
+			todosCursorAdapter.changeCursor(values[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			datasource.close();
+		}
+		
+	}
+	
+	private class AddTodoItem extends AsyncTask<Void, Cursor, Void> {
+			
+			private String title;
+			private Date dueDate;
+			
+			public AddTodoItem(String title, Date dueDate) {
+				this.title = title;
+				this.dueDate = dueDate;
+			}
+			
+			@Override
+			protected void onPreExecute() {
+				datasource.open();
+			}
+			
+			@Override
+			protected Void doInBackground(Void... params) {
+				datasource.addTodo(title, dueDate);
+				Cursor cursor = datasource.getCursorForAllTodos();
+				// force the query to be fully executed
+				cursor.getCount();
+				publishProgress(cursor);
+				return null;
+			}
+			
+			@Override
+			protected void onProgressUpdate(Cursor... values) {
+				todosCursorAdapter.changeCursor(values[0]);
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				datasource.close();
+			}
 	}
 
 }
